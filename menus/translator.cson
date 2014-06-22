@@ -1,0 +1,15 @@
+'context-menu':
+  '.overlayer':
+      'Translate': 'translator:toggle'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Translator'
+      'submenu': [
+        { 'label': 'Translate', 'command': 'translator:translate' }
+      ]
+    ]
+  }
+]
