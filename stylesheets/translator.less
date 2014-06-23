@@ -1,6 +1,35 @@
 @import "ui-variables";
 
-.translator p {
-  background-color: white;
-  width: 200px;
+.translator {
+  // TODO (amatyushentsev): Implement dynamic resizing.
+  height: 400px;
+  overflow: auto;
+  margin: 0px;
+  padding: 5px;
+
+  .close {
+    color: @text-color;
+  }
+
+  .language-selector {
+    @langItemWidth: 90px;
+
+    .btn-default {
+      width: @langItemWidth;
+    }
+
+    .dropdown-menu {
+      width : 452px;
+      background-color: @base-background-color;
+
+      li {
+        width : @langItemWidth;
+        display: inline-block;
+
+        a {
+          color: @text-color;
+        }
+      }
+    }
+  }
 }

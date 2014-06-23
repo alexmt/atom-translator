@@ -6,11 +6,18 @@ TranslatorView = require './translator-view'
 dataMarketAccessUrl = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13'
 
 azureAppSettings = {
-  client_id: 'your client id here',
-  client_secret: 'your client secret here',
+  client_id: 'atom-translator',
+  # Please don't abuse!
+  client_secret: '8i5GjrCXS+Iab9TcaKn7gNkTcjIJn2hxPr7pLFsRhQA=',
   scope: 'http://api.microsofttranslator.com'
   grant_type: 'client_credentials'
 }
+
+# TODO(amatyushentsev): load languages using Translator API instead of hardcoding.
+languages = ["auto", "ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fi","fr","de","el",
+  "ht", "he","hi","mww","hu","id","it","ja","tlh","tlh-Qaak","ko","lv","lt","ms","mt","no","fa",
+  "pl","pt", "ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi","cy"]
+
 
 accessToken = null
 
@@ -44,24 +51,35 @@ callTranslatorApi = (method, params) ->
   return deferred.promise
 
 translateText = (text, from, to) ->
-  callTranslatorApi 'Translate', { from: 'en', to: 'ru', text: text }
+  callTranslatorApi 'Translate', { from: from, to: to, text: text }
 
 module.exports =
+
+  translatorView: null
 
   activate: (state) ->
     atom.workspaceView.command "translator:translate", => @translate()
 
+  getTranslatorView: (editor, languages) ->
+    if !@translatorView
+      @translatorView = new TranslatorView({ editor: editor, languages: languages })
+      @translatorView.on 'close', => @closeTranslatorView()
+      atom.workspaceView.prependToBottom(@translatorView)
+    else
+      @translatorView.attachToEditor(editor)
+    return @translatorView
+
   translate: ->
-    editor = atom.workspaceView.find('.editor.is-focused')
-    if editor.length == 1
-      translator = editor.find('.translator')
-      if translator.length == 0
-        view = new TranslatorView(atom.workspace.getActiveEditor())
-        editor.append(view)
-      else
-        view = translator.view()
-      translateText(view.getInputTest(), 'en', 'ru').then (result) ->
+    editor = atom.workspace.getActiveEditor()
+    if editor
+      view = @getTranslatorView(editor, languages)
+      translateText(view.getInputTest(), 'en', 'ru').then (result) =>
         view.showTranslation result
+
+  closeTranslatorView: ->
+    if @translatorView
+      @translatorView.destroy()
+      @translatorView = null
 
   deactivate: ->
 
