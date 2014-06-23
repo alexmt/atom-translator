@@ -9,13 +9,12 @@ class TranslatorView extends View
   @content: (params)->
     @div class: 'translator tool-panel panel-bottom panel', =>
       @div class: 'btn-toolbar', =>
-        @subview 'from', new LanguageSelectorView(languages: params.languages, lang: 'auto')
+        @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
         @button '<->', class: 'btn'
-        @subview 'to', new LanguageSelectorView(languages: params.languages, lang: 'en')
+        @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)
         @button 'Translate', class: 'btn'
       @div class: 'panel-body', =>
         @p ""
-
 
   initialize: (params) ->
     @prepend('<a class="close">&times;</a>')

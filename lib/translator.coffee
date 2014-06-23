@@ -14,7 +14,7 @@ azureAppSettings = {
 }
 
 # TODO(amatyushentsev): load languages using Translator API instead of hardcoding.
-languages = ["auto", "ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fi","fr","de","el",
+languages = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fi","fr","de","el",
   "ht", "he","hi","mww","hu","id","it","ja","tlh","tlh-Qaak","ko","lv","lt","ms","mt","no","fa",
   "pl","pt", "ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi","cy"]
 
@@ -55,15 +55,21 @@ translateText = (text, from, to) ->
 
 module.exports =
 
-  translatorView: null
+  translatorView: null,
 
   activate: (state) ->
     atom.workspaceView.command "translator:translate", => @translate()
 
   getTranslatorView: (editor, languages) ->
     if !@translatorView
-      @translatorView = new TranslatorView({ editor: editor, languages: languages })
+      @translatorView = new TranslatorView(
+        editor: editor,
+        languages: languages,
+        from: 'en',
+        to: 'ru')
       @translatorView.on 'close', => @closeTranslatorView()
+      @translatorView.from.on 'langChanged', (lang) => @translate()
+      @translatorView.to.on 'langChanged', (lang) => @translate()
       atom.workspaceView.prependToBottom(@translatorView)
     else
       @translatorView.attachToEditor(editor)
@@ -73,8 +79,11 @@ module.exports =
     editor = atom.workspace.getActiveEditor()
     if editor
       view = @getTranslatorView(editor, languages)
-      translateText(view.getInputTest(), 'en', 'ru').then (result) =>
-        view.showTranslation result
+      view.showTranslation '...'
+      translateText(
+        view.getInputTest(),
+        view.from.getSelectedLanguage(),
+        view.to.getSelectedLanguage()).then (result) => view.showTranslation result
 
   closeTranslatorView: ->
     if @translatorView
