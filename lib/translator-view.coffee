@@ -5,6 +5,8 @@ module.exports =
 class TranslatorView extends View
 
   editor: null
+  textFinalizedTimer: null
+  translationWaitTimeoutMilliseconds: 1000
 
   @content: (params)->
     @div class: 'translator tool-panel panel-bottom panel', =>
@@ -34,11 +36,29 @@ class TranslatorView extends View
   showTranslation: (text) ->
     @find('p').text(text)
 
-  requestTranslation: ->
+  requestTranslation: =>
     @trigger 'translateRequested'
 
-  attachToEditor: (editor) ->
-    @editor = editor
+  detachFromEditor: ->
+    if @textFinalizedTimer
+      clearTimeout @textFinalizedTimer
+      @textFinalizedTimer = null
+    if @editor
+      @editor.buffer.off 'changed', @onTextChanged
 
-  destroy: ->
+  attachToEditor: (editor) ->
+    @detachFromEditor()
+    @editor = editor
+    @editor.buffer.on 'changed', @onTextChanged
+
+  onTextChanged: =>
+    if @textFinalizedTimer
+      clearTimeout @textFinalizedTimer
+      @textFinalizedTimer = null
+    @textFinalizedTimer = setTimeout (=>
+      @textFinalizedTimer = null
+      @requestTranslation() ), @translationWaitTimeoutMilliseconds
+
+  destroy: =>
+    @detachFromEditor()
     @detach()
