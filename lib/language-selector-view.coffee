@@ -21,7 +21,7 @@ class LanguageSelectorView extends View
     @langButton.text(lang)
     @removeClass('open')
     if triggerEvent and oldLang != lang
-      @trigger 'langChanged', [ lang ]
+      @trigger 'langChanged'
 
   getSelectedLanguage: ->
     return @langButton.text()

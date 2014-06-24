@@ -10,7 +10,7 @@ class TranslatorView extends View
     @div class: 'translator tool-panel panel-bottom panel', =>
       @div class: 'btn-toolbar', =>
         @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
-        @button '<->', class: 'btn'
+        @button '<->', class: 'btn', click: 'switchLangs'
         @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)
         @button 'Translate', class: 'btn'
       @div class: 'panel-body', =>
@@ -22,6 +22,11 @@ class TranslatorView extends View
     @attachToEditor(params.editor)
 
   getInputTest: -> @editor.getText()
+
+  switchLangs: ->
+    fromLang = @from.getSelectedLanguage()
+    @from.selectLanguage(@to.getSelectedLanguage(), false)
+    @to.selectLanguage(fromLang, true)
 
   showTranslation: (text) ->
     @find('p').text(text)

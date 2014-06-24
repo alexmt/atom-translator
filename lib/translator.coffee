@@ -68,8 +68,8 @@ module.exports =
         from: 'en',
         to: 'ru')
       @translatorView.on 'close', => @closeTranslatorView()
-      @translatorView.from.on 'langChanged', (lang) => @translate()
-      @translatorView.to.on 'langChanged', (lang) => @translate()
+      @translatorView.from.on 'langChanged', => @translate()
+      @translatorView.to.on 'langChanged', => @translate()
       atom.workspaceView.prependToBottom(@translatorView)
     else
       @translatorView.attachToEditor(editor)
