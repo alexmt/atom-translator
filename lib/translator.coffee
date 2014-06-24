@@ -13,22 +13,18 @@ azureAppSettings = {
   grant_type: 'client_credentials'
 }
 
-# TODO(amatyushentsev): load languages using Translator API instead of hardcoding.
-languages = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fi","fr","de","el",
-  "ht", "he","hi","mww","hu","id","it","ja","tlh","tlh-Qaak","ko","lv","lt","ms","mt","no","fa",
-  "pl","pt", "ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi","cy"]
-
-
 accessToken = null
 
 getAccessToken = () ->
   deferred = q.defer()
   if accessToken == null
     request.post 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13', {
-      form: azureAppSettings
+      form: azureAppSettings,
+      json: true,
+      encoding: 'utf8',
     }, (error, response, body) ->
       if !error and response.statusCode == 200
-        accessToken = JSON.parse(body).access_token
+        accessToken = body.access_token
         deferred.resolve(accessToken)
       else
         deferred.reject(error)
@@ -42,6 +38,8 @@ callTranslatorApi = (method, params) ->
     params.appId = "Bearer #{token}"
     request {
       url : "http://api.microsofttranslator.com/V2/Ajax.svc/#{method}",
+      json: true,
+      encoding: 'utf8',
       qs: params
     }, (error, response, body) ->
       if !error and response.statusCode == 200
@@ -51,7 +49,9 @@ callTranslatorApi = (method, params) ->
   return deferred.promise
 
 translateText = (text, from, to) ->
-  callTranslatorApi 'Translate', { from: from, to: to, text: text }
+  callTranslatorApi 'Translate', from: from, to: to, text: text
+
+getLanguages = -> callTranslatorApi 'GetLanguagesForTranslate', {}
 
 module.exports =
 
@@ -77,12 +77,13 @@ module.exports =
   translate: ->
     editor = atom.workspace.getActiveEditor()
     if editor
-      view = @getTranslatorView(editor, languages)
-      view.showTranslation '...'
-      translateText(
-        view.getInputTest(),
-        view.from.getSelectedLanguage(),
-        view.to.getSelectedLanguage()).then (result) => view.showTranslation result
+      getLanguages().then (languages) =>
+        view = @getTranslatorView(editor, languages)
+        view.showTranslation '...'
+        translateText(
+          view.getInputTest(),
+          view.from.getSelectedLanguage(),
+          view.to.getSelectedLanguage()).then (result) => view.showTranslation result
 
   closeTranslatorView: ->
     if @translatorView
