@@ -29,7 +29,7 @@ class TranslatorView extends View
     @to.on 'langChanged', => @requestTranslation()
     @attachToEditor(params.editor)
     @on 'mousedown', '.resizer', @resizeStarted
-    @height(MIN_HEIGHT)
+    @height(params.viewHeight ? MIN_HEIGHT)
 
   resizeStarted: (e) =>
     $(document).on 'mousemove', @resizeView
@@ -42,6 +42,8 @@ class TranslatorView extends View
   resizeStopped: (e) =>
     $(document).off 'mousemove', @resizeView
     $(document).off 'mouseup', @resizeStopped
+    @viewHeight = @height()
+    @trigger 'heightChanged'
 
   getInputTest: -> @editor.buffer.lines
 

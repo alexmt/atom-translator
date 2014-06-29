@@ -61,8 +61,10 @@ module.exports =
 
   translatorView: null,
   languages: null,
+  state: null,
 
   activate: (state) ->
+    @state = state ? {}
     atom.workspaceView.command "translator:translate", => @translate()
 
   getTranslatorView: (editor, languages) ->
@@ -71,9 +73,11 @@ module.exports =
         editor: editor,
         languages: languages,
         from: 'en',
-        to: 'ru')
+        to: 'ru',
+        viewHeight: @state.viewHeight)
       @translatorView.on 'close', => @closeTranslatorView()
       @translatorView.on 'translateRequested', => @refreshViewTranslation(@translatorView)
+      @translatorView.on 'heightChanged', => @state.viewHeight = @translatorView.height()
       atom.workspaceView.prependToBottom(@translatorView)
     else
       @translatorView.attachToEditor(editor)
@@ -102,5 +106,7 @@ module.exports =
       @translatorView = null
 
   deactivate: ->
+    @closeTranslatorView()
 
-  serialize: -> {}
+  serialize: =>
+    return @state
