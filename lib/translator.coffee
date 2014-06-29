@@ -60,6 +60,7 @@ getLanguages = -> callTranslatorApi 'GetLanguagesForTranslate', {}
 module.exports =
 
   translatorView: null,
+  languages: null,
 
   activate: (state) ->
     atom.workspaceView.command "translator:translate", => @translate()
@@ -72,22 +73,28 @@ module.exports =
         from: 'en',
         to: 'ru')
       @translatorView.on 'close', => @closeTranslatorView()
-      @translatorView.on 'translateRequested', => @translate()
+      @translatorView.on 'translateRequested', => @refreshViewTranslation(@translatorView)
       atom.workspaceView.prependToBottom(@translatorView)
     else
       @translatorView.attachToEditor(editor)
     return @translatorView
 
-  translate: ->
+  refreshViewTranslation: (view) ->
+    view.showTranslationHtml '...'
+    translateTextLines(
+      view.getInputTest(),
+      view.from.getSelectedLanguage(),
+      view.to.getSelectedLanguage()).then (result) => view.showTranslationHtml result
+
+  translate: (view) ->
     editor = atom.workspace.getActiveEditor()
     if editor
-      getLanguages().then (languages) =>
-        view = @getTranslatorView(editor, languages)
-        view.showTranslationHtml '...'
-        translateTextLines(
-          view.getInputTest(),
-          view.from.getSelectedLanguage(),
-          view.to.getSelectedLanguage()).then (result) => view.showTranslationHtml result
+      if !@languages
+        getLanguages().then (languages) =>
+          @languages = languages
+          @refreshViewTranslation @getTranslatorView(editor, @languages)
+      else
+        @refreshViewTranslation @getTranslatorView(editor, @languages)
 
   closeTranslatorView: ->
     if @translatorView
