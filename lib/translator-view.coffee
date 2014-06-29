@@ -16,27 +16,13 @@ class TranslatorView extends View
   @content: (params)->
     @div class: 'translator tool-panel panel-bottom panel', =>
       @div class: 'resizer'
-      @div class: 'translator-content-view', =>
-        @div class: 'btn-toolbar', =>
-          @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
-          @button '<->', class: 'btn', click: 'switchLangs'
-          @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)
-          @button 'Translate', class: 'btn', click: 'requestTranslation'
-          @button 'Settings', class: 'btn', role: 'show-settings', click: 'showSettings'
-        @div class: 'panel-body', =>
-          @p ""
-      @div class: 'translator-settings-view', =>
-        @form role: 'form', =>
-          @div class: 'form-group', =>
-            @label 'Client ID', for: 'client-id'
-            @input outlet: 'clientIdInput', type: 'text', class: 'form-control',id: 'client-id'
-          @div class: 'form-group', =>
-            @label 'Client Secret', for: 'client-secret'
-            @input outlet: 'clientSecretInput', type: 'text', class: 'form-control', id: 'client-secret'
-        @div class: 'btn-toolbar', =>
-          @button 'Save', class: 'btn', role: 'save', click: 'saveSettingsChanges'
-          @button 'Cancel', class: 'btn', role: 'cancel', click: 'cancelSettingsChanges'
-          @button 'Set Default', class: 'btn', role: 'save', click: 'cancelSettingsChanges'
+      @div class: 'btn-toolbar', =>
+        @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
+        @button '<->', class: 'btn', click: 'switchLangs'
+        @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)
+        @button 'Translate', class: 'btn', click: 'requestTranslation'
+      @div class: 'panel-body', =>
+        @p ""
 
   initialize: (params) ->
     @prepend('<a class="close">&times;</a>')
@@ -46,13 +32,6 @@ class TranslatorView extends View
     @attachToEditor(params.editor)
     @on 'mousedown', '.resizer', @resizeStarted
     @height(params.viewHeight ? MIN_HEIGHT)
-    @setSettings params.azureAppSettings
-
-  setSettings: (settings) =>
-    @clientId = settings.client_id
-    @clientSecret = settings.client_secret
-    @clientIdInput.val(@clientId)
-    @clientSecretInput.val(@clientSecret)
 
   resizeStarted: (e) =>
     $(document).on 'mousemove', @resizeView
@@ -67,20 +46,6 @@ class TranslatorView extends View
     $(document).off 'mouseup', @resizeStopped
     @viewHeight = @height()
     @trigger 'heightChanged'
-
-  showSettings: =>
-    @addClass('translator-settings-view')
-
-  saveSettingsChanges: =>
-    @clientSecret = @clientSecretInput.val()
-    @clientId = @clientIdInput.val()
-    @trigger('settingsChanged')
-    @removeClass('translator-settings-view')
-
-  cancelSettingsChanges: =>
-    @clientSecretInput.val(@clientSecret)
-    @clientIdInput.val(@clientId)
-    @removeClass('translator-settings-view')
 
   getInputTest: -> @editor.buffer.lines
 
