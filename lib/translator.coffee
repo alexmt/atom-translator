@@ -74,7 +74,8 @@ module.exports =
         languages: languages,
         from: 'en',
         to: 'ru',
-        viewHeight: @state.viewHeight)
+        viewHeight: @state.viewHeight,
+        azureAppSettings: azureAppSettings)
       @translatorView.on 'close', => @closeTranslatorView()
       @translatorView.on 'translateRequested', => @refreshViewTranslation(@translatorView)
       @translatorView.on 'heightChanged', => @state.viewHeight = @translatorView.height()
