@@ -48,8 +48,12 @@ callTranslatorApi = (method, params) ->
         deferred.reject error
   return deferred.promise
 
-translateText = (text, from, to) ->
-  callTranslatorApi 'Translate', from: from, to: to, text: text
+translateTextLines = (lines, from, to) ->
+  callTranslatorApi 'Translate',
+    from: from,
+    to: to,
+    text: lines.join('<br/>'),
+    options: { ContentType : 'text/plain' }
 
 getLanguages = -> callTranslatorApi 'GetLanguagesForTranslate', {}
 
@@ -79,11 +83,11 @@ module.exports =
     if editor
       getLanguages().then (languages) =>
         view = @getTranslatorView(editor, languages)
-        view.showTranslation '...'
-        translateText(
+        view.showTranslationHtml '...'
+        translateTextLines(
           view.getInputTest(),
           view.from.getSelectedLanguage(),
-          view.to.getSelectedLanguage()).then (result) => view.showTranslation result
+          view.to.getSelectedLanguage()).then (result) => view.showTranslationHtml result
 
   closeTranslatorView: ->
     if @translatorView

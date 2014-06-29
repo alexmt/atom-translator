@@ -25,7 +25,7 @@ class TranslatorView extends View
     @to.on 'langChanged', => @requestTranslation()
     @attachToEditor(params.editor)
 
-  getInputTest: -> @editor.getText()
+  getInputTest: -> @editor.buffer.lines
 
   switchLangs: ->
     fromLang = @from.getSelectedLanguage()
@@ -33,8 +33,8 @@ class TranslatorView extends View
     @to.selectLanguage(fromLang, false)
     @requestTranslation()
 
-  showTranslation: (text) ->
-    @find('p').text(text)
+  showTranslationHtml: (text) ->
+    @find('p').html(text)
 
   requestTranslation: =>
     @trigger 'translateRequested'
