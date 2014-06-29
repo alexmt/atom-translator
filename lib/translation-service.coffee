@@ -17,25 +17,26 @@ class TranslationService
       client_secret: appSettings.clientSecret
     }
 
-  getAccessToken: () =>
+  getAccessToken: () ->
     deferred = q.defer()
     if @accessToken == null
       request.post 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13', {
         form: @appSettings,
         json: true,
         encoding: 'utf8',
-      }, (error, response, body) ->
+      }, (error, response, body) =>
         if !error and response.statusCode == 200
           @accessToken = body.access_token
           deferred.resolve(@accessToken)
         else
           deferred.reject(error)
     else
-      deferred.resolve(accessToken)
+      deferred.resolve(@accessToken)
     return deferred.promise
 
-  callTranslatorApi: (method, params) =>
-    deferred = q.defer()
+  callTranslatorApi: (method, params, remainingAttempts, deferred) ->
+    remainingAttempts = remainingAttempts ? 1
+    deferred = deferred ? q.defer()
     @getAccessToken().then (token) =>
       params.appId = "Bearer #{token}"
       request {
@@ -45,16 +46,27 @@ class TranslationService
         qs: params
       }, (error, response, body) =>
         if !error and response.statusCode == 200
-          deferred.resolve response.body
+          # Check if API request failed.
+          if /ArgumentException: .*: ID=.*V2_Json[.].*/.test(body)
+            error = body
+          else
+            deferred.resolve response.body
         else
-          deferred.reject error
+          error = error ? response.statusCode
+        if error
+          # Try to refresh token and execute request few more times
+          if remainingAttempts > 0
+            @accessToken = null
+            @callTranslatorApi(method, params, --remainingAttempts, deferred)
+          else
+            deferred.reject error
     return deferred.promise
 
-  translateTextLines: (lines, from, to) =>
+  translateTextLines: (lines, from, to) ->
     @callTranslatorApi 'Translate',
       from: from,
       to: to,
       text: lines.join('<br/>'),
-      options: { ContentType : 'text/html' }
+      contentType : 'text/html'
 
-  getLanguages: => @callTranslatorApi 'GetLanguagesForTranslate', {}
+  getLanguages: -> @callTranslatorApi 'GetLanguagesForTranslate', {}
