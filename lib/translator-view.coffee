@@ -1,5 +1,8 @@
-{View} = require 'atom'
+{$, View} = require 'atom'
 LanguageSelectorView = require './language-selector-view'
+
+# Min translate panel height
+MIN_HEIGHT = 100
 
 module.exports =
 class TranslatorView extends View
@@ -10,6 +13,7 @@ class TranslatorView extends View
 
   @content: (params)->
     @div class: 'translator tool-panel panel-bottom panel', =>
+      @div class: 'resizer'
       @div class: 'btn-toolbar', =>
         @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
         @button '<->', class: 'btn', click: 'switchLangs'
@@ -24,6 +28,20 @@ class TranslatorView extends View
     @from.on 'langChanged', => @requestTranslation()
     @to.on 'langChanged', => @requestTranslation()
     @attachToEditor(params.editor)
+    @on 'mousedown', '.resizer', @resizeStarted
+    @height(MIN_HEIGHT)
+
+  resizeStarted: (e) =>
+    $(document).on 'mousemove', @resizeView
+    $(document).on 'mouseup', @resizeStopped
+
+  resizeView: (e) =>
+    height = @height()
+    @height(Math.max(height + @position().top - e.pageY, MIN_HEIGHT))
+
+  resizeStopped: (e) =>
+    $(document).off 'mousemove', @resizeView
+    $(document).off 'mouseup', @resizeStopped
 
   getInputTest: -> @editor.buffer.lines
 

@@ -1,11 +1,14 @@
 @import "ui-variables";
 
 .translator {
-  // TODO (amatyushentsev): Implement dynamic resizing.
-  height: 400px;
   overflow: auto;
   margin: 0px;
   padding: 5px;
+
+  .resizer {
+    height: 5px;
+    cursor: ns-resize;
+  }
 
   .close {
     color: @text-color;
