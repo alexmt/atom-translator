@@ -1,6 +1,6 @@
 'context-menu':
   '.overlayer':
-      'Translate': 'translator:toggle'
+      'Translate': 'translator:translate'
 
 'menu': [
   {
