@@ -23,8 +23,8 @@ module.exports =
       @translatorView = new TranslatorView(
         editor: editor,
         languages: languages,
-        from: 'en',
-        to: 'ru',
+        from: @state.from ? 'en',
+        to: @state.to ? 'ru',
         viewHeight: @state.viewHeight,
         azureAppSettings: {})
       @translatorView.on 'close', => @closeTranslatorView()
@@ -36,6 +36,8 @@ module.exports =
     return @translatorView
 
   refreshViewTranslation: (view) ->
+    @state.from = view.from.getSelectedLanguage()
+    @state.to = view.to.getSelectedLanguage()
     view.showTranslationHtml '...'
     @translationService.translateTextLines(
       view.getInputTest(),
