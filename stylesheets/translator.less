@@ -1,9 +1,18 @@
 @import "ui-variables";
 
 .translator {
-  overflow: auto;
+
   margin: 0px;
   padding: 5px;
+
+  .translator-content-view {
+    height: 100%;
+
+    .panel-body {
+      height: 100%;
+      overflow: auto;
+    }
+  }
 
   .resizer {
     height: 5px;
