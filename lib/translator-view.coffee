@@ -55,8 +55,11 @@ class TranslatorView extends View
     @to.selectLanguage(fromLang, false)
     @requestTranslation()
 
-  showTranslationHtml: (text) ->
-    @find('textarea').html(text)
+  showTranslation: (text) ->
+    @find('textarea').text(text)
+
+  showError: (text) ->
+    @find('textarea').text(text)
 
   requestTranslation: =>
     @trigger 'translateRequested'

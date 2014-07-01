@@ -1,5 +1,7 @@
 TranslationService = require './translation-service'
 TranslatorView = require './translator-view'
+RETRIEVE_LANGUAGES_ERROR = 'Cannot retrieve supported languages'
+TRANSLATION_FAILED = 'Translation failed'
 
 module.exports =
 
@@ -38,19 +40,26 @@ module.exports =
   refreshViewTranslation: (view) ->
     @state.from = view.from.getSelectedLanguage()
     @state.to = view.to.getSelectedLanguage()
-    view.showTranslationHtml '...'
-    @translationService.translateTextLines(
+    view.showTranslation '...'
+    promise =@translationService.translateTextLines(
       view.getInputTest(),
       view.from.getSelectedLanguage(),
-      view.to.getSelectedLanguage()).then (result) => view.showTranslationHtml result
+      view.to.getSelectedLanguage())
+    promise.then(
+      ((result) -> view.showTranslation(result)),
+      ((error) -> view.showError(TRANSLATION_FAILED + ':\n' + error)) )
 
   translate: (view) ->
     editor = atom.workspace.getActiveEditor()
     if editor
       if !@languages
-        @translationService.getLanguages().then (languages) =>
-          @languages = languages
-          @refreshViewTranslation @getTranslatorView(editor, @languages)
+        @translationService.getLanguages()
+          .then (languages) =>
+            @languages = languages
+            @refreshViewTranslation @getTranslatorView(editor, @languages)
+          .catch (error) =>
+            @getTranslatorView(editor, []).showError RETRIEVE_LANGUAGES_ERROR +
+              ':\n' + error
       else
         @refreshViewTranslation @getTranslatorView(editor, @languages)
 

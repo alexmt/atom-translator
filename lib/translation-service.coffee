@@ -35,9 +35,10 @@ class TranslationService
     return deferred.promise
 
   callTranslatorApi: (method, params, remainingAttempts, deferred) ->
+
     remainingAttempts = remainingAttempts ? 1
     deferred = deferred ? q.defer()
-    @getAccessToken().then (token) =>
+    @getAccessToken().then ((token) =>
       params.appId = "Bearer #{token}"
       request {
         url : "http://api.microsofttranslator.com/V2/Ajax.svc/#{method}",
@@ -52,21 +53,21 @@ class TranslationService
           else
             deferred.resolve response.body
         else
-          error = error ? response.statusCode
+          error = error ? 'Response code: ' + response.statusCode
         if error
           # Try to refresh token and execute request few more times
           if remainingAttempts > 0
             @accessToken = null
             @callTranslatorApi(method, params, --remainingAttempts, deferred)
           else
-            deferred.reject error
+            deferred.reject error ), (error) -> deferred.reject error
     return deferred.promise
 
   translateTextLines: (lines, from, to) ->
     @callTranslatorApi 'Translate',
       from: from,
       to: to,
-      text: lines.join('<br/>'),
-      contentType : 'text/html'
+      text: lines.join('\r\n'),
+      contentType : 'text/plain'
 
   getLanguages: -> @callTranslatorApi 'GetLanguagesForTranslate', {}
