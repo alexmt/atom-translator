@@ -22,7 +22,7 @@ class TranslatorView extends View
         @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)
         @button 'Translate', class: 'btn', click: 'requestTranslation'
       @div class: 'panel-body', =>
-        @p ""
+        @textarea class : 'native-key-bindings'
 
   initialize: (params) ->
     @prepend('<a class="close">&times;</a>')
@@ -56,7 +56,7 @@ class TranslatorView extends View
     @requestTranslation()
 
   showTranslationHtml: (text) ->
-    @find('p').html(text)
+    @find('textarea').html(text)
 
   requestTranslation: =>
     @trigger 'translateRequested'
