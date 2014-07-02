@@ -1,4 +1,5 @@
 {WorkspaceView} = require 'atom'
+q = require 'q'
 Translator = require '../lib/translator'
 
 describe "Translator", ->
