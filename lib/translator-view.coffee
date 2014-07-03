@@ -47,7 +47,7 @@ class TranslatorView extends View
     @viewHeight = @height()
     @trigger 'heightChanged'
 
-  getInputTest: -> @editor.buffer.lines
+  getInputTextLines: -> @editor.buffer.lines
 
   switchLangs: ->
     fromLang = @from.getSelectedLanguage()

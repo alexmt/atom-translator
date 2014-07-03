@@ -41,8 +41,8 @@ module.exports =
     @state.from = view.from.getSelectedLanguage()
     @state.to = view.to.getSelectedLanguage()
     view.showTranslation '...'
-    promise =@translationService.translateTextLines(
-      view.getInputTest(),
+    promise = @translationService.translateTextLines(
+      view.getInputTextLines(),
       view.from.getSelectedLanguage(),
       view.to.getSelectedLanguage())
     promise.then(
