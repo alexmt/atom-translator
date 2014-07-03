@@ -1,4 +1,6 @@
-# translator package
+translator package
+[![Build Status](https://travis-ci.org/alexmt/atom-translator.svg?branch=master)](https://travis-ci.org/alexmt/atom-translator)
+===========
 
 A tool to translate text in Atom.io via Microsoft Translator API.
 
