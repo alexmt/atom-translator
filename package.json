@@ -1,7 +1,7 @@
 {
   "name": "translator",
   "main": "./lib/translator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A tool to translate text via Microsoft Translator API",
   "activationEvents": [
     "translator:translate"
