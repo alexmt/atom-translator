@@ -16,7 +16,7 @@ class TranslatorView extends View
   @content: (params)->
     @div class: 'translator tool-panel panel-bottom panel', =>
       @div class: 'resizer'
-      @div class: 'btn-toolbar', =>
+      @div class: 'btn-group', =>
         @subview 'from', new LanguageSelectorView(languages: params.languages, lang: params.from)
         @button '<->', class: 'btn', click: 'switchLangs'
         @subview 'to', new LanguageSelectorView(languages: params.languages, lang: params.to)

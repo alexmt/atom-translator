@@ -3,7 +3,7 @@
 .translator {
 
   margin: 0px;
-  padding: 5px;
+  padding: 0 5px 5px 5px;
 
   .panel-body {
     height: 100%;
@@ -31,13 +31,28 @@
   .language-selector {
     @langItemWidth: 90px;
 
+    .caret {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #000;
+      position: absolute;
+      left: 5px;
+      top: 12px;
+    }
+
     .btn-default {
       width: @langItemWidth;
     }
 
     .dropdown-menu {
+      position: absolute;
+      display: none;
+      top: @component-line-height + 5px;
       width : 452px; // 90px * 5 + 2px for border.
       background-color: @base-background-color;
+      border: solid @base-border-color 1px;
 
       li {
         width : @langItemWidth;
@@ -48,5 +63,8 @@
         }
       }
     }
+  }
+  .language-selector.open .dropdown-menu {
+    display: block;
   }
 }
