@@ -1,4 +1,4 @@
-{$, View} = require 'atom'
+{$, View} = require 'atom-space-pen-views'
 LanguageSelectorView = require './language-selector-view'
 
 # Min translate panel height
