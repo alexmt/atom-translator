@@ -8,6 +8,7 @@ module.exports =
 class TranslatorView extends View
 
   editor: null
+  events: []
   textFinalizedTimer: null
   translationWaitTimeoutMilliseconds: 1000,
   clientId: null,
@@ -39,7 +40,7 @@ class TranslatorView extends View
 
   resizeView: (e) =>
     height = @height()
-    @height(Math.max(height + @position().top - e.pageY, MIN_HEIGHT))
+    @height(Math.max(height + @offset().top - e.pageY, MIN_HEIGHT))
 
   resizeStopped: (e) =>
     $(document).off 'mousemove', @resizeView
@@ -68,13 +69,14 @@ class TranslatorView extends View
     if @textFinalizedTimer
       clearTimeout @textFinalizedTimer
       @textFinalizedTimer = null
-    if @editor
-      @editor.buffer.off 'changed', @onTextChanged
+    for event in @events
+      event.dispose()
+    @events = []
 
   attachToEditor: (editor) ->
     @detachFromEditor()
     @editor = editor
-    @editor.buffer.on 'changed', @onTextChanged
+    @events.push(@editor.buffer.onDidChange @onTextChanged)
 
   onTextChanged: =>
     if @textFinalizedTimer

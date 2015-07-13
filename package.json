@@ -3,9 +3,9 @@
   "main": "./lib/translator",
   "version": "0.2.0",
   "description": "A tool to translate text via Microsoft Translator API",
-  "activationEvents": [
-    "translator:translate"
-  ],
+  "activationCommands": {
+   "atom-text-editor": ["translator:translate"]
+  },
   "repository": "https://github.com/alexmt/atom-translator",
   "license": "MIT",
   "engines": {

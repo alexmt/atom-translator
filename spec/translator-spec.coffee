@@ -1,4 +1,3 @@
-{WorkspaceView} = require 'atom'
 q = require 'q'
 Translator = require '../lib/translator'
 
@@ -12,8 +11,7 @@ describe 'Translator package', ->
     getLanguagesDeferred = q.defer()
     translateTextLinesDeferred = q.defer()
 
-    atom.workspaceView = new WorkspaceView()
-    spyOn(atom.workspaceView, 'prependToBottom')
+    spyOn(atom.workspace, 'addBottomPanel')
     waitsForPromise ->
       atom.workspace.open 'new.txt'
 
@@ -27,18 +25,17 @@ describe 'Translator package', ->
 
     Translator.translationService = translationService
 
-
   it 'reloads list of available languages', ->
     Translator.languages = null
 
-    atom.workspaceView.trigger 'translator:translate'
+    atom.commands.dispatch atom.views.getView(atom.workspace), 'translator:translate'
 
     expect(translationService.getLanguages).toHaveBeenCalled()
 
   it 'translates input text of active editor', ->
-    atom.workspace.getActiveEditor().setText('Hello world')
+    atom.workspace.getActiveTextEditor().setText('Hello world')
 
-    atom.workspaceView.trigger 'translator:translate'
+    atom.commands.dispatch atom.views.getView(atom.workspace), 'translator:translate'
 
     waitsFor ->
       translationService.translateTextLines.callCount > 0
@@ -48,15 +45,15 @@ describe 'Translator package', ->
 
   it 'creates view and sets translation result', ->
 
-    atom.workspaceView.trigger 'translator:translate'
+    atom.commands.dispatch atom.views.getView(atom.workspace), 'translator:translate'
 
     waitsFor ->
       translationService.translateTextLines.callCount > 0 and
-      atom.workspaceView.prependToBottom.callCount > 0
+      atom.workspace.addBottomPanel.callCount > 0
 
     runs ->
-      view = atom.workspaceView.prependToBottom.mostRecentCall.args[0]
-      expect(view.find('textarea').text()).toEqual('...')
+      view = atom.workspace.addBottomPanel.mostRecentCall.args[0]
+      expect(view.item.find('textarea').text()).toEqual('...')
 
       translateTextLinesDeferred.resolve 'Translation result'
 
@@ -64,4 +61,4 @@ describe 'Translator package', ->
         translateTextLinesDeferred.promise
 
       runs ->
-        expect(view.find('textarea').text()).toEqual('Translation result')
+        expect(view.item.find('textarea').text()).toEqual('Translation result')

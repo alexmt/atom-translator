@@ -1,6 +1,5 @@
 'context-menu':
-  '.overlayer':
-      'Translate': 'translator:translate'
+  'atom-workspace': [{label: 'Translate', command: 'translator:translate'}]
 
 'menu': [
   {

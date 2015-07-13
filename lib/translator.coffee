@@ -18,7 +18,7 @@ module.exports =
   activate: (state) ->
     @state = state ? {}
     @translationService = new TranslationService(@configDefaults)
-    atom.workspaceView.command "translator:translate", => @translate()
+    atom.commands.add "atom-workspace", "translator:translate", => @translate()
 
   getTranslatorView: (editor, languages) ->
     if !@translatorView
@@ -32,7 +32,7 @@ module.exports =
       @translatorView.on 'close', => @closeTranslatorView()
       @translatorView.on 'translateRequested', => @refreshViewTranslation(@translatorView)
       @translatorView.on 'heightChanged', => @state.viewHeight = @translatorView.height()
-      atom.workspaceView.prependToBottom(@translatorView)
+      atom.workspace.addBottomPanel(item: @translatorView)
     else
       @translatorView.attachToEditor(editor)
     return @translatorView
@@ -50,7 +50,7 @@ module.exports =
       ((error) -> view.showError(TRANSLATION_FAILED + ':\n' + error)) )
 
   translate: (view) ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     if editor
       if !@languages
         @translationService.getLanguages()
